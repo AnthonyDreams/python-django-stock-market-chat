@@ -1,7 +1,7 @@
 
 # run celery
 
-* celery -A mysite worker -l info
+* celery -A stockchatapp worker -l info
 
 # run redis 
 
