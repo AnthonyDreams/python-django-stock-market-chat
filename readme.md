@@ -5,4 +5,4 @@
 
 # run redis 
 
-* redis server
+* redis-server
