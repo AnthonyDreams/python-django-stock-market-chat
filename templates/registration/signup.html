@@ -1,0 +1,29 @@
+
+{% load bootstrap4 %}
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+<h1>Sign up now</h1>
+
+<div >
+    <a  href="{% url 'login' %}">Have an account?</a>
+</div>   
+
+{% block content %}
+<div>
+    <h1>Sign Up</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+          <button type="submit" class="btn btn-primary">
+            Submit
+          </button>
+        {% endbuttons %}
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %} {{room_name}} {% endblock %}
+{% block content %}
+        <h1> {{ room_name|json_script:"room-name" }} </h1>
+        <div class="chat">
+            <div class="messages">
+                <ul class="message-list">
+                    {% for message in messages %}
+                    <li class="message-item {% if message.user == user %} item-secondary {% else %} item-primary {% endif %}">
+                        {{message.user.username}}: {{message.message}}
+                    </li>
+                    {% endfor %}
+
+                </ul>
+                <div class="message-input">
+                    <input id="chat-message-input" type="text" size="100" placeholder="Type your message..." />
+                    <button id="chat-message-submit" type="button" class="btn">Send</button>
+                </div>
+            </div>
+        </div>
+    <script>
+        // Variables
+        var messages = document.querySelector('.message-list')
+        var btn = document.querySelector('.btn')
+        var input = document.querySelector('input')
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const chatSocket = new ReconnectingWebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        // Button/Enter Key
+        btn.addEventListener('click', sendMessage)
+        input.addEventListener('keyup', function (e) { if (e.keyCode == 13) sendMessage() })
+
+        // Messenger Functions
+        function sendMessage() {
+            var msg = input.value;
+            chatSocket.send(JSON.stringify({
+                'message': msg
+            }));
+            input.value = ''
+        }
+        function addMessage(e) {
+            var msg = e.data ? JSON.parse(e.data) : e;
+            console.log(msg)
+            writeLine(`${msg.from}: ${msg.message}`, msg.itself)
+        
+        }
+        function writeLine(text, itself=false) {
+            var message = document.createElement('li')
+            message.classList.add('message-item', itself ? 'item-secondary' : 'item-primary')
+            message.innerHTML = text
+            messages.appendChild(message)
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        chatSocket.addEventListener('message', addMessage)
+        
+        chatSocket.addEventListener('close', function (e) {
+            console.error('Chat socket closed unexpectedly');
+        });
+    </script>
+{% endblock %}
